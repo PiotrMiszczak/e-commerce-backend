@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import config from './config'
 import mongoose from 'mongoose'
 import userRoute from '../routes/userRoute'
+import bodyParser from 'body-parser'
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ mongoose.connect(MONGODBURL, {
 
 
 const app = express();
+app.use(bodyParser.json())
 
 app.use('/api/users',userRoute)
 

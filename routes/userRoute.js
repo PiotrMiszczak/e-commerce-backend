@@ -1,5 +1,6 @@
 import express from 'express'
 import User from '../models/userModel'
+import getToken from '../util'
 
 const router = express.Router();
 
@@ -20,25 +21,51 @@ router.get("/createadmin", async (req, res)=>{
 })
 
 router.post("/signin", async (req, res)=>{
+   
     try {
-        const user = User.findOne({
-            email: req.body.email,
-            password: req.body.password
-        }
-        )
+        
+        const user = await User.findOne({
+          password: req.body.password,
+          email: req.body.email,
+               })
         if(user){
+            
         res.send({
             name: user.name,
-            email: user.email,
-            password: user.password,
             isAdmin: user.isAdmin,
-            token: getToken(user)
+            email:user.email,
+           // token: getToken(user)
         });
         }
       }
     catch(error){
-        console.log('err')
+        console.log('invalid')
     }
 })
+
+router.post("/register", async (req, res)=>{
+ 
+      const user = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        isAdmin: false,
+      });
+      const newUser = await user.save();
+      if (newUser) {
+        res.send({
+
+          name: newUser.name,
+          email: newUser.email,
+          isAdmin: newUser.isAdmin,
+          
+        });
+      } else {
+        res.status(401).send({ message: 'Invalid User Data.' });
+      }
+    
+  
+})
+
 
 export default router
