@@ -1,6 +1,7 @@
 import express from 'express'
 import User from '../models/userModel'
-import getToken from '../util'
+import {getToken} from '../util'
+import bcrypt from 'bcrypt'
 
 const router = express.Router();
 
@@ -22,24 +23,24 @@ router.get("/createadmin", async (req, res)=>{
 
 router.post("/signin", async (req, res)=>{
    
-    try {
+    
         
         const user = await User.findOne({
-          password: req.body.password,
           email: req.body.email,
                })
-        if(user){
-            
+
+        if(user && bcrypt.compareSync(req.body.password, user.password)==true){
         res.send({
+          id: user._id,
             name: user.name,
             isAdmin: user.isAdmin,
             email:user.email,
-           // token: getToken(user)
+           token: getToken(user)
         });
         }
-      }
-    catch(error){
-        console.log('invalid')
+      
+    else{
+      res.status(401).send({ msg: 'Invalid User Data.' });
     }
 })
 
@@ -54,10 +55,11 @@ router.post("/register", async (req, res)=>{
       const newUser = await user.save();
       if (newUser) {
         res.send({
-
+          id:newUser._id,
           name: newUser.name,
           email: newUser.email,
           isAdmin: newUser.isAdmin,
+          token: getToken(user)
           
         });
       } else {
