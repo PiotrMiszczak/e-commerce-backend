@@ -15,23 +15,26 @@ const isAuth = (req,res,next) =>{
         const onlyToken = token.slice(7,token.length)
         jwt.verify(onlyToken, config.JWT_SECRET, (err,decode)=>{
             if(err){
-                res.status(401).send({msg:'invalid token'})
+                res.status(401).send({msg:'invalid token'});
+                console.log('tutaj1')
             }
-            req.user = token;
+            req.user = decode;
             next()
             return
         })
     }
-    return res.status(401).send({msg: 'token is not supplied'})
-}
+    else{
+    return console.log('tutaj2')//res.status(401).send({msg: 'token is not supplied'})
+}}
 
 const isAdmin = (req,res,next) =>{
     if(req.user && req.user.isAdmin){
-        next();
-        return
+        return next();
+        
     }
-    return res.status(401).send({msg:'Not adming'})
+    else{
+    return console.log('tutaj3') //res.status(401).send({msg:'Not adming'})
 
-}
+}}
 
 export {getToken, isAdmin, isAuth }

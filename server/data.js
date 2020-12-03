@@ -13,6 +13,7 @@ export default{
     name: "Etha Cummings",
     avatar: "https://s3.amazonaws.com/uifaces/faces/twitter/omnizya/128.jpg",
     price: 83,
+    qty:0
   },
   {
     id: "3",

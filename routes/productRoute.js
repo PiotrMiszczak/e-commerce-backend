@@ -1,27 +1,26 @@
 import express from 'express'
 import Product from '../models/productModel'
-
+import {isAuth, isAdmin} from '../util'
 
 const router = express.Router();
 
 router.get('/', async (req,res)=>{
 
     const products = await Product.find({})
-    if(products){
-        return res.send(products)
-    }
-    else return res.status(401).send({msg:'no products'})
-})
+    res.send(products)
+    })
+  
 
-router.post('/', async (req,res)=>{
-
+router.post('/',isAuth, isAdmin, async (req,res)=>{
+    const products = await Product.find({})
     const product = new Product({
-        id: req.body.id,
+        id:products.length + 1,
         name:req.body.name,
         avatar: req.body.avatar,
         price:req.body.price,
         brand:req.body.brand,
         category:req.body.category,
+        qty:req.body.qty,
         review:req.body.review,
         numofrev:req.body.numofrev,
         description:req.body.description
@@ -29,9 +28,9 @@ router.post('/', async (req,res)=>{
     
         const newProduct = await product.save()
         if(newProduct){
-        return res.send(newProduct)
+        res.status(201).send({msg:'product created', data:newProduct})
     }
-    else return res.status(401).send({msg:'request invalid'})
+    else return console.log('tutaj4')//res.status(401).send({msg:'request invalid'})
 })
 
 
