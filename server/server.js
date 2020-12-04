@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 import config from './config'
 import mongoose from 'mongoose'
 import userRoute from '../routes/userRoute'
-import productRoute from '../routes/productRoute'
+//import productRoute from '../routes/productRoute'
 import bodyParser from 'body-parser'
 import Product from '../models/productModel'
 import {isAuth, isAdmin} from '../util'
@@ -36,7 +36,7 @@ app.get('/api/products', async (req,res)=>{
 app.post('/api/products',isAuth, isAdmin, async (req,res)=>{
     const products = await Product.find({})
     const product = new Product({
-        id:products.length + 1,
+        //id:products.length + 1,
         name:req.body.name,
         avatar: req.body.avatar,
         price:req.body.price,
@@ -54,11 +54,11 @@ app.post('/api/products',isAuth, isAdmin, async (req,res)=>{
     }
     else return console.log('tutaj4')//res.status(401).send({msg:'request invalid'})
 })
-app.get("/products/api/products/:id", async (req,res)=>{
-    const productId = req.params.id;
-    const product = await Product.findOne({
-        id:productId
-    })
+app.get("/products/api/products/:_id", async (req,res)=>{
+    const productId = req.params._id;
+    const product = await Product.findById(
+        productId
+    )
    if(product){
        res.send(product)}
     else{
@@ -66,11 +66,11 @@ app.get("/products/api/products/:id", async (req,res)=>{
     }
 });
 
-app.get("/api/products/:id",async (req,res)=>{
-    const productId = req.params.id;
-    const product = await Product.findOne({
-        id:productId
-    })
+app.get("/api/products/:_id",async (req,res)=>{
+    const productId = req.params._id;
+    const product = await Product.findById(
+        productId
+    )
    if(product){
        res.send(product)}
     else{
@@ -78,11 +78,11 @@ app.get("/api/products/:id",async (req,res)=>{
     }
 });
 
-app.get("/cart/api/products/:id", async (req,res)=>{
-    const productId = req.params.id;
-    const product = await Product.findOne({
-        id:productId
-    })
+app.get("/cart/api/products/:_id", async (req,res)=>{
+    const productId = req.params._id;
+    const product = await Product.findById(
+        productId
+    )
    if(product){
        res.send(product)}
     else{
