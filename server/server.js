@@ -9,6 +9,7 @@ import bodyParser from 'body-parser'
 import Product from '../models/productModel'
 import {isAuth, isAdmin} from '../util'
 
+
 dotenv.config();
 
 const MONGODBURL = config.MONGODB_URL;
@@ -50,10 +51,31 @@ app.post('/api/products',isAuth, isAdmin, async (req,res)=>{
     
         const newProduct = await product.save()
         if(newProduct){
-        res.status(201).send({msg:'product created', data:newProduct})
+       return res.status(201).send({msg:'product created', data:newProduct})
     }
-    else return console.log('tutaj4')//res.status(401).send({msg:'request invalid'})
+    else return res.status(500).send({msg:'request invalid'})
 })
+
+app.put('/api/products/:_id',isAuth, isAdmin, async (req,res)=>{
+    const productId = req.params._id;
+    const product = await Product.findById(productId)
+  if(product){
+    product.name=req.body.name,
+    product.avatar=req.body.avatar,
+    product.price=req.body.price,
+    product.brand=req.body.brand,
+    product.category=req.body.category,
+    product.qty=req.body.qty,
+    product.description=req.body.description
+  }
+    
+        const updatedProduct = await product.save()
+        if(updatedProduct){
+       return res.status(200).send({msg:'product updated', data:updatedProduct})
+    }
+    else return res.status(500).send({msg:'request invalid'})
+})
+
 app.get("/products/api/products/:_id", async (req,res)=>{
     const productId = req.params._id;
     const product = await Product.findById(
@@ -75,6 +97,18 @@ app.get("/api/products/:_id",async (req,res)=>{
        res.send(product)}
     else{
         res.status(404).send({msg:'NOT xcxcFOUND'})
+    }
+});
+app.delete("/api/products/:_id",isAuth, isAdmin, async (req,res)=>{
+    const productId = req.params._id;
+    const deletedProduct = await Product.findById(
+        productId
+    )
+   if(deletedProduct){
+       await deletedProduct.remove()
+       res.send({message:'Product deleted'})}
+    else{
+        res.status(404).send({msg:'Error in removing'})
     }
 });
 

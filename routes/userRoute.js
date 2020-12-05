@@ -40,7 +40,7 @@ router.post("/signin", async (req, res)=>{
         }
       
     else{
-      res.status(401).send({ msg: 'Invalid User Data.' });
+      res.status(401).send({ message: 'Invalid User Data.' });
     }
 })
 
