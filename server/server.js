@@ -169,7 +169,20 @@ app.get("/api/orders/mine",isAuth, async (req,res)=>{
         res.send(orders)
     }
     else(
-        console.log('jestem')
+        res.status(404).send({message:'orders not found'})
+    ) 
+   
+ });
+
+ 
+app.get("/api/orders/all",isAuth,isAdmin, async (req,res)=>{
+    const orders = await Order.find({
+    })
+    if(orders){
+        res.send(orders)
+    }
+    else(
+        res.status(404).send({message:'order not found'})
     ) 
    
  });
@@ -191,11 +204,29 @@ app.put("/orders/api/orders/pay/:_id",isAuth, async (req,res)=>{
    
  });
 
+ 
+app.put("/orders/api/orders/deliver/:_id",isAuth, async (req,res)=>{
+    const orderId = req.params._id
+    const order = await Order.findById(orderId)
+    if(order){
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+    
+    const updatedOrder = await order.save()
+    res.send({message:'order delivered'})}
+    else{
+        
+        res.status(404).send({message:'order not found'})
+    }
+    
+   
+ });
+
 app.get('/orders/api/config/paypal', async (req,res)=>{
     res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
 })
 
 const __dirname = path.resolve();
-//app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.listen(5000, ()=>console.log('Server started at http://localhost:5000'))
