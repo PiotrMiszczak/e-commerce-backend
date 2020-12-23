@@ -1,13 +1,15 @@
 import express from 'express';
-import data from './data'
 import dotenv from 'dotenv'
 import config from './config'
 import mongoose from 'mongoose'
-import userRoute from '../routes/userRoute'
+import userRouter from '../routes/userRoute'
 //import productRoute from '../routes/productRoute'
 import bodyParser from 'body-parser'
 import Product from '../models/productModel'
+import Order from '../models/orderModel'
 import {isAuth, isAdmin} from '../util'
+import uploadRouter from '../routes/uploadRoute';
+import path from 'path'
 
 
 dotenv.config();
@@ -25,7 +27,8 @@ const app = express();
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/api/users',userRoute)
+app.use('/api/users',userRouter)
+app.use('/api/uploads', uploadRouter)
 //app.use('/api/products',productRoute)
 app.get('/api/products', async (req,res)=>{
 
@@ -123,5 +126,76 @@ app.get("/cart/api/products/:_id", async (req,res)=>{
         res.status(404).send({msg:'NOT xcxcFOUND'})
     }
 });
+
+app.post("/api/orders",isAuth, async (req,res)=>{
+    if(req.body.orderItems.length == 0){
+        res.status(400).send({message:'No items'})
+    }
+    else{
+    const newOrder = new Order({
+        orderItems: req.body.orderItems,
+        user: req.user.id,
+        paymentMethod: req.body.payment,
+        shipping: req.body.shipping,
+        totalPrice: req.body.totalPrice,
+        deliveryPrice: req.body.deliveryPrice
+ })
+ const createdOrder = await newOrder.save()
+     res.status(200).send({message:'Order created', data:createdOrder})
+}
+  
+});
+
+app.get("/orders/api/orders/:_id", async (req,res)=>{
+   const orderId = req.params._id
+   const order = await Order.findById(orderId)
+   if(order){
+       res.send(order)
+   }
+   else{
+       
+       res.status(404).send({message:'order not found'})
+   }
+   
+  
+});
+
+app.get("/api/orders/mine",isAuth, async (req,res)=>{
+    const orders = await Order.find({
+        user: req.user.id
+        
+    })
+    if(orders){
+        res.send(orders)
+    }
+    else(
+        console.log('jestem')
+    ) 
+   
+ });
+
+app.put("/orders/api/orders/pay/:_id",isAuth, async (req,res)=>{
+    const orderId = req.params._id
+    const order = await Order.findById(orderId)
+    if(order){
+        order.isPaid = true;
+        order.paidAt = Date.now();
+    
+    const updatedOrder = await order.save()
+    res.send({message:'order paid'})}
+    else{
+        
+        res.status(404).send({message:'order not found'})
+    }
+    
+   
+ });
+
+app.get('/orders/api/config/paypal', async (req,res)=>{
+    res.send(process.env.PAYPAL_CLIENT_ID || 'sb');
+})
+
+const __dirname = path.resolve();
+//app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.listen(5000, ()=>console.log('Server started at http://localhost:5000'))

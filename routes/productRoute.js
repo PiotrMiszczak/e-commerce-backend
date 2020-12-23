@@ -14,7 +14,7 @@ router.get('/', async (req,res)=>{
 router.post('/',isAuth, isAdmin, async (req,res)=>{
     const products = await Product.find({})
     const product = new Product({
-        id:products.length + 1,
+        //id:products.length + 1,
         name:req.body.name,
         avatar: req.body.avatar,
         price:req.body.price,

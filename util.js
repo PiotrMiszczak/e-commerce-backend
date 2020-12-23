@@ -16,15 +16,17 @@ const isAuth = (req,res,next) =>{
         jwt.verify(onlyToken, config.JWT_SECRET, (err,decode)=>{
             if(err){
                 res.status(401).send({msg:'invalid token'});
-                console.log('tutaj1')
+                console.log('A tera dla odmiany token zjebany')
+                
             }
             req.user = decode;
+            console.log('jest ok')
             next()
             return
         })
     }
     else{
-    return console.log('tutaj2')//res.status(401).send({msg: 'token is not supplied'})
+    return console.log('A teraz nie jest ok')//res.status(401).send({msg: 'token is not supplied'})
 }}
 
 const isAdmin = (req,res,next) =>{
@@ -33,7 +35,7 @@ const isAdmin = (req,res,next) =>{
         
     }
     else{
-    return console.log('tutaj3') //res.status(401).send({msg:'Not adming'})
+    return res.status(401).send({msg:'Not admin'})
 
 }}
 
